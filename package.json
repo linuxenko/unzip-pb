@@ -1,0 +1,39 @@
+{
+  "name": "unzip-pb",
+  "version": "0.0.1",
+  "description": "Database and backup of PB currencies stored in different formats with every day data synchronization with original api.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo test",
+    "deploy": "deploy-to-git",
+    "build": "node index.js"
+  },
+  "config": {
+    "deployToGit": {
+      "repository": "https://$GH_TOKEN_PB@github.com/linuxenko/unzip-pb.git",
+      "branch": "master",
+      "folder": "zip",
+      "script": "npm run build",
+      "commit": "[up] mr.builder deploy",
+      "user": {
+        "email": "linuxenko@yahoo.com",
+        "name": "Mr.Build"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linuxenko/unzip-pb.git"
+  },
+  "author": "Svetlana Linuxenko <linuxenko@yahoo.com> (http://www.linuxenko.pro)",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/linuxenko/unzip-pb/issues"
+  },
+  "homepage": "https://github.com/linuxenko/unzip-pb#readme",
+  "devDependencies": {
+    "deploy-to-git": "0.0.7",
+    "moment": "^2.15.1",
+    "sync-request": "^3.0.1"
+  }
+}

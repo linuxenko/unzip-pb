@@ -1,0 +1,13 @@
+sudo: required
+language: node_js
+node_js:
+  - "6"
+install:
+  - npm i
+script:
+  - npm run deploy 
+branches:
+  only:
+    - build
+  except:
+    - master
