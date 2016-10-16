@@ -5,9 +5,9 @@
 'use strict';
 
 const moment = require('moment'),
-      path = require('path'),
-      fs  = require('fs'),
-      request = require('sync-request');
+  path = require('path'),
+  fs  = require('fs'),
+  request = require('sync-request');
 
 const API_URI="https://api.privatbank.ua/p24api/exchange_rates?json&date=";
 const OUT_DIR=path.resolve(__dirname, "zip");
@@ -29,7 +29,7 @@ if (!fs.existsSync(path.resolve(OUT_DIR, 'dump'))) {
 
 const createFD = function(name) {
   let filename = path.resolve(OUT_DIR, name + '.json');
-  
+
   fds[name] = fs.createWriteStream(filename);
 }
 
@@ -44,7 +44,7 @@ while(!currentDate.isSame(CURRENT_YEAR, 'year')) {
 createFD(moment(CURRENT_YEAR).format('YYYY'));
 
 
-const fetchRemote = function (date) { 
+const fetchRemote = function (date) {
   try {
     let res = request('GET', API_URI + date);
     return res.getBody('utf8');
@@ -54,20 +54,30 @@ const fetchRemote = function (date) {
   }
 }
 
-const fetchData = function(date) {
+const fetchData = function(currentDate) {
+  const date = currentDate.format(FORMAT);
   const FILENAME = path.resolve(OUT_DIR, 'dump/' + date + '.json');
-  
+
   if (fs.existsSync(FILENAME)) {
     return fs.readFileSync(FILENAME);
   }
-  
+
   let data = JSON.parse(fetchRemote(date));
-  
+
   if (data.hasOwnProperty('date')) {
-    data = JSON.stringify(data);
-    console.log('Caching ' + date);
-    fs.writeFileSync(path.resolve(OUT_DIR, 'dump/' + date + '.json'), data);
-    return data;
+    const out = JSON.stringify(data);
+
+    /**
+     *  Do not cachee last year leaks
+     */
+    if (data.exchangeRate.length < 1 && currentDate.isSame(TODAY, 'year')) {
+      console.log('Empty data for ' + date);
+    } else {
+      console.log('Caching ' + date);
+      fs.writeFileSync(path.resolve(OUT_DIR, 'dump/' + date + '.json'), out);
+    }
+
+    return out;
   }
 
   return false;
@@ -81,7 +91,7 @@ while(!currentDate.isSame(TODAY)) {
   let year = currentDate.format('YYYY');
 
   if (fds.hasOwnProperty(year)) {
-    let data = fetchData(currentDate.format(FORMAT));
+    let data = fetchData(currentDate);
 
     if (data === false) {
       console.log('No data available for ' + currentDate.format(FORMAT));
@@ -89,12 +99,12 @@ while(!currentDate.isSame(TODAY)) {
 
       if (lastYear !== year) {
         lastYear = year;
-     } else {
-       fds[year].write(',\n');    
-     }
+      } else {
+        fds[year].write(',\n');
+      }
 
-     fds[year].write(data);
-   }
+      fds[year].write(data);
+    }
   }
   currentDate = currentDate.add(1, 'day');
 }
