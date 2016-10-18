@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo test",
     "deploy": "deploy-to-git",
-    "build": "node index.js"
+    "build": "node index.js && node chart-lines.js"
   },
   "config": {
     "deployToGit": {
@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/linuxenko/unzip-pb#readme",
   "devDependencies": {
+    "d3-node": "^0.2.0",
     "deploy-to-git": "0.0.7",
     "moment": "^2.15.1",
     "sync-request": "^3.0.1"
